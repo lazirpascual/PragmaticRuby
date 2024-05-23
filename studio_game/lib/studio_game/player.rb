@@ -8,6 +8,11 @@ class Player
     @found_treasures = Hash.new(0)
   end
 
+  def self.from_csv(line)
+    name, health = line.split(',')
+    Player.new(name, health.to_i)
+  end
+
   def drain
     @health -= 10
   end
