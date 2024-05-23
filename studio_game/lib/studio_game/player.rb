@@ -1,6 +1,12 @@
+require_relative "playable"
+
 class Player
+  include Playable
+
   attr_accessor :name
-  attr_reader :health, :found_treasures
+  attr_reader :found_treasures
+  attr_accessor :health
+
 
   def initialize(name, health = 100)
     @name = name.capitalize
@@ -14,14 +20,6 @@ class Player
   rescue ArgumentError
     puts "Ignored invalid health: #{health}"
     Player.new(name)
-  end
-
-  def drain
-    @health -= 10
-  end
-
-  def boost
-    @health += 15
   end
 
   def score
