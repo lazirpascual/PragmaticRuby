@@ -2,45 +2,86 @@ require "minitest/autorun"
 
 require_relative "../../lib/studio_game/player"
 
-class PlayerTest < Minitest::Test
+module StudioGame
+  class PlayerTest < Minitest::Test
 
-  def test_has_a_capitalized_name
-    player = Player.new("finn", 60)
+    def test_has_a_capitalized_name
+      player = Player.new("finn", 60)
 
-    assert_equal "Finn", player.name
-  end
+      assert_equal "Finn", player.name
+    end
 
-  def test_has_an_initial_health
-    player = Player.new("finn", 60)
+    def test_has_an_initial_health
+      player = Player.new("finn", 60)
 
-    assert_equal 60, player.health
-  end
+      assert_equal 60, player.health
+    end
 
-  def test_has_a_string_representation
-    player = Player.new("finn", 60)
+    def test_has_a_string_representation
+      player = Player.new("finn", 60)
 
-    assert_equal "I'm Finn with a health of 60 and a score of 64", player.to_s
-  end
+      expected = "I'm Finn with health = 60, points = 0, and score = 60"
+      assert_equal expected, player.to_s
+    end
 
-  def test_computes_score_as_sum_of_health_and_length_of_name
-    player = Player.new("finn", 60)
+    def test_boost_increases_health_by_15
+      player = Player.new("finn", 60)
 
-    assert_equal 64, player.score
-  end
+      player.boost
 
-  def test_boost_increases_health_by_15
-    player = Player.new("finn", 60)
+      assert_equal 75, player.health
+    end
 
-    player.boost
+    def test_drain_decreases_health_by_10
+      player = Player.new("finn", 60)
 
-    assert_equal 75, player.health
-  end
+      player.drain
 
-  def test_drain_decreases_health_by_10
-    player = Player.new("finn", 60)
+      assert_equal 50, player.health
+    end
 
-    player.drain
+    def test_found_treasure
+      player = Player.new("finn", 60)
 
-    assert_equal 50, player.health
+      assert_empty player.found_treasures
+
+      player.found_treasure("pie", 10)
+
+      expected = {"pie" => 10}
+      assert_equal expected, player.found_treasures
+
+      player.found_treasure("crown", 90)
+
+      expected = {"pie" => 10, "crown" => 90}
+      assert_equal expected, player.found_treasures
+
+      player.found_treasure("crown", 90)
+
+      expected = {"pie" => 10, "crown" => 180}
+      assert_equal expected, player.found_treasures
+    end
+
+    def test_has_points_as_the_sum_of_all_treasure_points
+      player = Player.new("finn", 60)
+
+      player.found_treasure("compass", 65)
+
+      assert_equal 65, player.points
+    end
+
+    def test_computes_score_as_sum_of_health_and_points
+      player = Player.new("finn", 60)
+
+        player.found_treasure("compass", 65)
+
+        assert_equal 125, player.score
+    end
+
+    def test_from_csv
+      player = Player.from_csv("finn,60")
+
+      assert_equal "Finn", player.name
+      assert_equal 60, player.health
+    end
   end
 end
